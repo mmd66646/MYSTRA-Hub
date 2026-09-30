@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery
 
 from BOT.keyboards.main import main_menu_keyboard
 from database.database import create_or_update_user
-
+from aiogram.types import FSInputFile
 
 router = Router()
 
@@ -19,17 +19,22 @@ def main_menu_text():
 
 @router.message(CommandStart())
 async def start_handler(message: Message):
+
     create_or_update_user(
         telegram_id=message.from_user.id,
         username=message.from_user.username,
         first_name=message.from_user.first_name,
     )
 
-    await message.answer(
-        main_menu_text(),
-        reply_markup=main_menu_keyboard(),
+    photo = FSInputFile(
+        "cards/main_menu.png"
     )
 
+    await message.answer_photo(
+        photo=photo,
+        caption=main_menu_text(),
+        reply_markup=main_menu_keyboard(),
+    )
 
 @router.callback_query(lambda c: c.data == "menu")
 async def menu_handler(callback: CallbackQuery):

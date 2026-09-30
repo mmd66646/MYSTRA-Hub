@@ -50,3 +50,29 @@ def astrology_month_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=buttons
     )
+
+
+def astrology_fortune_keyboard(month: int):
+
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🔮 دریافت فال MYSTRA",
+                    callback_data=f"astrology:fortune:{month}",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🌙 بازگشت به ماه‌شناسی",
+                    callback_data=f"astrology:month:{month}",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🏠 منوی اصلی",
+                    callback_data="menu",
+                )
+            ],
+        ]
+    )

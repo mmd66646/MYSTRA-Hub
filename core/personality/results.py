@@ -101,7 +101,11 @@ PROFILE_TITLES = {
 }
 
 
-def get_dimension_description(dimension: str, raw_score: int) -> str:
+def get_dimension_description(
+    dimension: str,
+    raw_score: int,
+) -> str:
+
     info = DIMENSION_INFO.get(dimension)
 
     if not info:
@@ -113,10 +117,11 @@ def get_dimension_description(dimension: str, raw_score: int) -> str:
     return info["low"]
 
 
-def score_bar(score: int, minimum: int = -5, maximum: int = 10) -> str:
-    """
-    ساخت نوار ساده برای نمایش شدت ویژگی.
-    """
+def score_bar(
+    score: int,
+    minimum: int = -5,
+    maximum: int = 10,
+) -> str:
 
     if score < minimum:
         score = minimum
@@ -126,26 +131,53 @@ def score_bar(score: int, minimum: int = -5, maximum: int = 10) -> str:
 
     total_blocks = 10
 
-    ratio = (score - minimum) / (maximum - minimum)
+    ratio = (score - minimum) / (
+        maximum - minimum
+    )
 
-    filled = round(ratio * total_blocks)
+    filled = round(
+        ratio * total_blocks
+    )
 
-    return "█" * filled + "░" * (total_blocks - filled)
+    return (
+        "█" * filled
+        + "░" * (total_blocks - filled)
+    )
 
 
 def generate_result(result: dict) -> str:
-    scores = result.get("scores", {})
-    profile = result.get("profile", {})
 
-    strongest = profile.get("strongest", [])
+    scores = result.get(
+        "scores",
+        {},
+    )
+
+    profile = result.get(
+        "profile",
+        {},
+    )
+
+    strongest = profile.get(
+        "strongest",
+        [],
+    )
+
+    weakest = profile.get(
+        "weakest",
+        [],
+    )
 
     if strongest:
+
         main_dimension = strongest[0][0]
+
         title = PROFILE_TITLES.get(
             main_dimension,
             "پروفایل منحصربه‌فرد",
         )
+
     else:
+
         title = "پروفایل متعادل"
 
     lines = [
@@ -153,7 +185,8 @@ def generate_result(result: dict) -> str:
         "",
         f"🧩 <b>{title}</b>",
         "",
-        "پاسخ‌هات یک الگوی شخصیتی خاص رو نشون می‌دن.",
+        "پاسخ‌هات فقط چند انتخاب ساده نبودن؛",
+        "از بینشون یک الگوی شخصیتی شکل گرفته.",
         "",
         "━━━━━━━━━━━━━━",
         "",
@@ -162,7 +195,10 @@ def generate_result(result: dict) -> str:
     ]
 
     for dimension, raw_score in strongest[:4]:
-        info = DIMENSION_INFO.get(dimension)
+
+        info = DIMENSION_INFO.get(
+            dimension
+        )
 
         if not info:
             continue
@@ -171,7 +207,9 @@ def generate_result(result: dict) -> str:
         emoji = info["emoji"]
 
         lines.append(
-            f"{emoji} <b>{name}</b>  {score_bar(raw_score)}  {raw_score:+d}"
+            f"{emoji} <b>{name}</b>  "
+            f"{score_bar(raw_score)}  "
+            f"{raw_score:+d}"
         )
 
     lines.extend([
@@ -185,6 +223,7 @@ def generate_result(result: dict) -> str:
     added = 0
 
     for dimension, raw_score in strongest:
+
         if added >= 3:
             break
 
@@ -196,20 +235,68 @@ def generate_result(result: dict) -> str:
         if not description:
             continue
 
-        lines.append(f"• {description}")
+        lines.append(
+            f"• {description}"
+        )
 
         added += 1
 
+    if weakest:
+
+        lines.extend([
+            "",
+            "━━━━━━━━━━━━━━",
+            "",
+            "🌑 <b>سمت کمتر دیده‌شده‌ی تو</b>",
+            "",
+        ])
+
+        added_weak = 0
+
+        for dimension, raw_score in weakest:
+
+            if added_weak >= 2:
+                break
+
+            info = DIMENSION_INFO.get(
+                dimension
+            )
+
+            if not info:
+                continue
+
+            lines.append(
+                f"{info['emoji']} "
+                f"<b>{info['name']}</b>"
+            )
+
+            lines.append(
+                get_dimension_description(
+                    dimension,
+                    raw_score,
+                )
+            )
+
+            added_weak += 1
+
     lines.extend([
+        "",
+        "━━━━━━━━━━━━━━",
+        "",
+        "🕯️ <b>پیام MYSTRA</b>",
+        "",
+        "هیچ ویژگی‌ای به‌تنهایی تو را تعریف نمی‌کند.",
+        "ترکیب انتخاب‌هایت چیزی را نشان می‌دهد "
+        "که در نگاه اول شاید دیده نشود.",
+        "",
+        "گاهی شناختن چیزی که درونت پنهان مانده، "
+        "مهم‌تر از پیدا کردن یک اسم برای شخصیتت است.",
         "",
         "━━━━━━━━━━━━━━",
         "",
         f"📊 پاسخ داده‌شده: "
         f"{result.get('answered', 0)} از "
         f"{result.get('total', 0)}",
-        "",
-        "این پروفایل بر اساس پاسخ‌های همین تست ساخته شده و "
-        "تشخیص علمی یا روان‌شناختی محسوب نمی‌شود.",
     ])
 
     return "\n".join(lines)

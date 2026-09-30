@@ -40,17 +40,44 @@ class AstrologyEngine:
         keyword_text = " • ".join(keywords)
 
         return (
-            "🌙 <b>پروفایل ماه‌شناسی MYSTRA</b>\n\n"
-            f"📅 ماه: <b>{month_data['name']}</b>\n\n"
+            "🌙 <b>ماه‌شناسی MYSTRA</b>\n\n"
+
+            f"📅 ماه تولد: <b>{month_data['name']}</b>\n"
             f"{sign.get('symbol', '')} "
-            f"<b>نشانه: {sign.get('name', '')}</b>\n"
-            f"🌍 عنصر نمادین: <b>{sign.get('element', '')}</b>\n\n"
+            f"نشانه: <b>{sign.get('name', '')}</b>\n"
+            f"🌍 عنصر: <b>{sign.get('element', month_data.get('element', ''))}</b>\n"
             f"{planet.get('symbol', '')} "
-            f"سیاره مرتبط: <b>{planet.get('name', '')}</b>\n"
-            f"✨ مضمون نمادین: <b>{planet.get('theme', '')}</b>\n\n"
-            "🔑 <b>کلیدواژه‌ها</b>\n"
-            f"{keyword_text}\n\n"
+            f"سیاره: <b>{planet.get('name', '')}</b>\n\n"
+
+            f"✨ <b>{month_data.get('theme', '')}</b>\n\n"
+
             "━━━━━━━━━━━━━━\n\n"
-            "این بخش بر اساس سنت‌های نمادین طالع‌بینی ساخته شده "
-            "و پیش‌بینی علمی شخصیت یا آینده محسوب نمی‌شود."
+
+            "🔮 <b>راز ماه تو</b>\n\n"
+            f"{month_data.get('mystery', '').strip()}\n\n"
+
+            "━━━━━━━━━━━━━━\n\n"
+
+            "🕯️ <b>آنچه درون تو پنهان است</b>\n\n"
+            f"{month_data.get('hidden', '').strip()}\n\n"
+
+            "━━━━━━━━━━━━━━\n\n"
+
+            "✨ <b>نیروی درونی</b>\n\n"
+            f"{month_data.get('strength', '').strip()}\n\n"
+
+            "🌑 <b>سایه‌ی شخصیت</b>\n\n"
+            f"{month_data.get('shadow', '').strip()}\n\n"
+
+            "❤️ <b>در قلمرو احساس</b>\n\n"
+            f"{month_data.get('love', '').strip()}\n\n"
+
+            "🔑 <b>کلیدواژه‌های تو</b>\n"
+            f"{keyword_text}\n\n"
+
+            "━━━━━━━━━━━━━━\n\n"
+
+            "🔮 <b>فال MYSTRA</b>\n\n"
+            "برای آشکار شدن فال اختصاصی ماهت،\n"
+            "روی دکمه زیر بزن... 🕯️"
         )

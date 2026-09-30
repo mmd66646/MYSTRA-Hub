@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from BOT.handlers.start import router as start_router
 from BOT.handlers.personality import router as personality_router
 from BOT.handlers.astrology import router as astrology_router
+from BOT.handlers.results import router as results_router
 
 from database.database import init_database
 
@@ -62,6 +63,7 @@ async def main():
     dp.include_router(start_router)
     dp.include_router(personality_router)
     dp.include_router(astrology_router)
+    dp.include_router(results_router)
 
     print("🔮 MYSTRA Hub is starting...")
 

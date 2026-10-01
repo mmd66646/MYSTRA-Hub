@@ -1,10 +1,10 @@
+
 from aiogram import Router
 from aiogram.filters import CommandStart
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from BOT.keyboards.main import main_menu_keyboard
 from database.database import create_or_update_user
-from aiogram.types import FSInputFile
 
 router = Router()
 
@@ -27,7 +27,7 @@ async def start_handler(message: Message):
     )
 
     photo = FSInputFile(
-        "cards/main_menu.png"
+        "cards/main_menu_fixed.png"
     )
 
     await message.answer_photo(
@@ -35,6 +35,7 @@ async def start_handler(message: Message):
         caption=main_menu_text(),
         reply_markup=main_menu_keyboard(),
     )
+
 
 @router.callback_query(lambda c: c.data == "menu")
 async def menu_handler(callback: CallbackQuery):
@@ -81,3 +82,4 @@ async def support_handler(callback: CallbackQuery):
         "<a href=\"https://www.mmdmehdi.ir/\">mmdmehdi.ir</a>",
         reply_markup=main_menu_keyboard(),
     )
+

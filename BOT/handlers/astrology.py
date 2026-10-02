@@ -1,5 +1,6 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.types import CallbackQuery, FSInputFile
 
 from BOT.keyboards.astrology import (
     astrology_month_keyboard,
@@ -12,17 +13,58 @@ router = Router()
 engine = AstrologyEngine()
 
 
+ASTROLOGY_MENU_TEXT = (
+    "🌙 <b>ماه‌شناسی MYSTRA</b>\n\n"
+    "هر ماه، داستانی پنهان در خود دارد...\n"
+    "ماه تولدت را انتخاب کن تا پرده از "
+    "بخشی از آن برداشته شود. 🔮\n\n"
+    "🕯️ <i>شاید چیزی درباره خودت بخوانی "
+    "که قبلاً به آن فکر نکرده بودی.</i>"
+)
+
+
+async def show_text(callback: CallbackQuery, text: str, reply_markup):
+    """
+    نمایش متن بلند.
+    اگر پیام فعلی عکس باشد، پاک می‌شود و پیام متنی جدید می‌آید.
+    اگر پیام فعلی متنی باشد، همان ویرایش می‌شود.
+    """
+    message = callback.message
+
+    if message.photo:
+        await message.delete()
+        await message.answer(text, reply_markup=reply_markup)
+        return
+
+    try:
+        await message.edit_text(text, reply_markup=reply_markup)
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e):
+            raise
+
+
 @router.callback_query(F.data == "astrology:menu")
 async def astrology_menu(callback: CallbackQuery):
     await callback.answer()
 
-    await callback.message.edit_text(
-        "🌙 <b>ماه‌شناسی MYSTRA</b>\n\n"
-        "هر ماه، داستانی پنهان در خود دارد...\n"
-        "ماه تولدت را انتخاب کن تا پرده از "
-        "بخشی از آن برداشته شود. 🔮\n\n"
-        "🕯️ <i>شاید چیزی درباره خودت بخوانی "
-        "که قبلاً به آن فکر نکرده بودی.</i>",
+    message = callback.message
+
+    if message.photo:
+        try:
+            await message.edit_caption(
+                caption=ASTROLOGY_MENU_TEXT,
+                reply_markup=astrology_month_keyboard(),
+            )
+        except TelegramBadRequest as e:
+            if "message is not modified" not in str(e):
+                raise
+        return
+
+    # اگر پیام متنی بود، عکس منو را دوباره می‌فرستیم
+    await message.delete()
+    await message.answer_photo(
+        photo=FSInputFile("cards/main_menu_fixed.png"),
+        caption=ASTROLOGY_MENU_TEXT,
         reply_markup=astrology_month_keyboard(),
     )
 
@@ -34,18 +76,20 @@ async def astrology_month(callback: CallbackQuery):
     try:
         month = int(callback.data.split(":")[-1])
     except (ValueError, AttributeError):
-        await callback.message.edit_text(
+        await show_text(
+            callback,
             "❌ <b>ماه نامعتبر است.</b>\n\n"
             "لطفاً یکی از ماه‌های موجود را انتخاب کن.",
-            reply_markup=astrology_month_keyboard(),
+            astrology_month_keyboard(),
         )
         return
 
     result = engine.generate_result(month)
 
-    await callback.message.edit_text(
+    await show_text(
+        callback,
         result,
-        reply_markup=astrology_fortune_keyboard(month),
+        astrology_fortune_keyboard(month),
     )
 
 
@@ -56,19 +100,21 @@ async def astrology_fortune(callback: CallbackQuery):
     try:
         month = int(callback.data.split(":")[-1])
     except (ValueError, AttributeError):
-        await callback.message.edit_text(
+        await show_text(
+            callback,
             "❌ <b>ماه نامعتبر است.</b>\n\n"
             "لطفاً دوباره وارد ماه‌شناسی شو.",
-            reply_markup=astrology_month_keyboard(),
+            astrology_month_keyboard(),
         )
         return
 
     profile = engine.get_profile(month)
 
     if not profile:
-        await callback.message.edit_text(
+        await show_text(
+            callback,
             "❌ <b>ماه نامعتبر است.</b>",
-            reply_markup=astrology_month_keyboard(),
+            astrology_month_keyboard(),
         )
         return
 
@@ -81,7 +127,8 @@ async def astrology_fortune(callback: CallbackQuery):
 
     month_name = month_data.get("name", "")
 
-    await callback.message.edit_text(
+    await show_text(
+        callback,
         "🔮 <b>فال MYSTRA</b>\n\n"
         f"🌙 ماه: <b>{month_name}</b>\n\n"
         "━━━━━━━━━━━━━━\n\n"
@@ -89,5 +136,5 @@ async def astrology_fortune(callback: CallbackQuery):
         "━━━━━━━━━━━━━━\n\n"
         "🕯️ <i>همه‌ی نشانه‌ها قرار نیست "
         "همان لحظه خودشان را نشان دهند...</i>",
-        reply_markup=astrology_fortune_keyboard(month),
+        astrology_fortune_keyboard(month),
     )

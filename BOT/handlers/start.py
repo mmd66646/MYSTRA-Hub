@@ -1,3 +1,4 @@
+from pathlib import Path
 
 from aiogram import Router
 from aiogram.filters import CommandStart
@@ -26,9 +27,11 @@ async def start_handler(message: Message):
         first_name=message.from_user.first_name,
     )
 
-    photo = FSInputFile(
-        "cards/main_menu_fixed.png"
-    )
+    # مسیر مطمئن فایل عکس نسبت به ریشه پروژه
+    project_root = Path(__file__).resolve().parent.parent.parent
+    photo_path = project_root / "cards" / "main_menu_fixed.png"
+
+    photo = FSInputFile(photo_path)
 
     await message.answer_photo(
         photo=photo,
@@ -41,8 +44,8 @@ async def start_handler(message: Message):
 async def menu_handler(callback: CallbackQuery):
     await callback.answer()
 
-    await callback.message.edit_text(
-        main_menu_text(),
+    await callback.message.edit_caption(
+        caption=main_menu_text(),
         reply_markup=main_menu_keyboard(),
     )
 
@@ -51,18 +54,20 @@ async def menu_handler(callback: CallbackQuery):
 async def about_handler(callback: CallbackQuery):
     await callback.answer()
 
-    await callback.message.edit_text(
-        "ℹ️ <b>درباره MYSTRA</b>\n\n"
-        "MYSTRA یک پروژه تعاملی برای کشف "
-        "الگوهای شخصیتی و ساخت پروفایل‌های اختصاصیه.\n\n"
-        "🧠 شخصیت‌شناسی\n"
-        "🌙 ماه‌شناسی\n"
-        "❤️ سازگاری\n"
-        "💎 سنگ‌ها\n"
-        "🃏 نتایج شخصی\n\n"
-        "━━━━━━━━━━━━━━\n\n"
-        "ساخته شده توسط <b>MmdMehdi</b>\n"
-        "🌐 <a href=\"https://www.mmdmehdi.ir/\">mmdmehdi.ir</a>",
+    await callback.message.edit_caption(
+        caption=(
+            "ℹ️ <b>درباره MYSTRA</b>\n\n"
+            "MYSTRA یک پروژه تعاملی برای کشف "
+            "الگوهای شخصیتی و ساخت پروفایل‌های اختصاصیه.\n\n"
+            "🧠 شخصیت‌شناسی\n"
+            "🌙 ماه‌شناسی\n"
+            "❤️ سازگاری\n"
+            "💎 سنگ‌ها\n"
+            "🃏 نتایج شخصی\n\n"
+            "━━━━━━━━━━━━━━\n\n"
+            "ساخته شده توسط <b>MmdMehdi</b>\n"
+            "🌐 <a href=\"https://www.mmdmehdi.ir/\">mmdmehdi.ir</a>"
+        ),
         reply_markup=main_menu_keyboard(),
     )
 
@@ -71,15 +76,16 @@ async def about_handler(callback: CallbackQuery):
 async def support_handler(callback: CallbackQuery):
     await callback.answer()
 
-    await callback.message.edit_text(
-        "🛠 <b>پشتیبانی MYSTRA Hub</b>\n\n"
-        "برای ارتباط با پشتیبانی، "
-        "می‌تونی با یکی از افراد زیر در ارتباط باشی:\n\n"
-        "👤 <a href=\"https://t.me/Sport31Hnc\">پشتیبانی ۱</a>\n"
-        "👤 <a href=\"https://t.me/AK477C4\">پشتیبانی ۲</a>\n\n"
-        "━━━━━━━━━━━━━━\n\n"
-        "🌐 <b>وب‌سایت MmdMehdi</b>\n"
-        "<a href=\"https://www.mmdmehdi.ir/\">mmdmehdi.ir</a>",
+    await callback.message.edit_caption(
+        caption=(
+            "🛠 <b>پشتیبانی MYSTRA Hub</b>\n\n"
+            "برای ارتباط با پشتیبانی، "
+            "می‌تونی با یکی از افراد زیر در ارتباط باشی:\n\n"
+            "👤 <a href=\"https://t.me/Sport31Hnc\">پشتیبانی ۱</a>\n"
+            "👤 <a href=\"https://t.me/AK477C4\">پشتیبانی ۲</a>\n\n"
+            "━━━━━━━━━━━━━━\n\n"
+            "🌐 <b>وب‌سایت MmdMehdi</b>\n"
+            "<a href=\"https://www.mmdmehdi.ir/\">mmdmehdi.ir</a>"
+        ),
         reply_markup=main_menu_keyboard(),
     )
-

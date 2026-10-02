@@ -65,8 +65,8 @@ async def send_question(
 
         await state.clear()
 
-        await callback.message.edit_text(
-            result_text,
+        await callback.message.edit_caption(
+            caption=result_text,
             reply_markup=personality_finish_keyboard(),
         )
 
@@ -88,8 +88,8 @@ async def send_question(
         f"{question['text']}"
     )
 
-    await callback.message.edit_text(
-        text,
+    await callback.message.edit_caption(
+        caption=text,
         reply_markup=personality_options_keyboard(
             question
         ),

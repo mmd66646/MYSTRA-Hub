@@ -1,6 +1,5 @@
-from pathlib import Path
-
 from aiogram import Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery, FSInputFile
 
@@ -27,11 +26,10 @@ async def start_handler(message: Message):
         first_name=message.from_user.first_name,
     )
 
-    # مسیر مطمئن فایل عکس نسبت به ریشه پروژه
-    project_root = Path(__file__).resolve().parent.parent.parent
-    photo_path = project_root / "cards" / "main_menu_fixed.png"
+    photo = FSInputFile(
+        "cards/main_menu_fixed.png"
+    )
 
-    photo = FSInputFile(photo_path)
 
     await message.answer_photo(
         photo=photo,
@@ -44,10 +42,28 @@ async def start_handler(message: Message):
 async def menu_handler(callback: CallbackQuery):
     await callback.answer()
 
-    await callback.message.edit_caption(
+    message = callback.message
+
+    if message.photo:
+        try:
+            await message.edit_caption(
+                caption=main_menu_text(),
+                reply_markup=main_menu_keyboard(),
+            )
+        except TelegramBadRequest as e:
+            if "message is not modified" not in str(e):
+                raise
+        return
+
+    # اگر پیام متنی بود (مثلاً نتیجه‌ی ماه‌شناسی)،
+    # پیام پاک می‌شود و عکس منو دوباره فرستاده می‌شود
+    await message.delete()
+    await message.answer_photo(
+        photo=FSInputFile("cards/main_menu_fixed.png"),
         caption=main_menu_text(),
         reply_markup=main_menu_keyboard(),
     )
+
 
 
 @router.callback_query(lambda c: c.data == "about")
@@ -80,6 +96,7 @@ async def support_handler(callback: CallbackQuery):
         caption=(
             "🛠 <b>پشتیبانی MYSTRA Hub</b>\n\n"
             "برای ارتباط با پشتیبانی، "
+
             "می‌تونی با یکی از افراد زیر در ارتباط باشی:\n\n"
             "👤 <a href=\"https://t.me/Sport31Hnc\">پشتیبانی ۱</a>\n"
             "👤 <a href=\"https://t.me/AK477C4\">پشتیبانی ۲</a>\n\n"

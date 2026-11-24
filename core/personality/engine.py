@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Dict, List
 
 
-# تمام ابعاد شخصیتی که MYSTRA در حال حاضر بررسی می‌کند
+#analyze personality 
 DIMENSIONS = [
     "social",
     "initiative",
@@ -21,10 +21,10 @@ DIMENSIONS = [
 
 class PersonalityEngine:
     """
-    موتور اصلی شخصیت‌شناسی MYSTRA.
+    MYSTRA main persona 
 
-    وظایف:
-    - دریافت پاسخ‌های کاربر
+    duty:
+    - getting answers from user
     - محاسبه امتیاز هر بُعد شخصیتی
     - نرمال‌سازی نتایج
     - پیدا کردن نقاط برجسته پروفایل
